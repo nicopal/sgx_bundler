@@ -1,0 +1,13 @@
+/* libhotcall_bundler.edl - Top EDL file. */
+
+enclave {
+
+    include "hotcall.h"
+
+    untrusted {};
+
+    trusted {
+    	    public int
+            hotcall_bundler_start([user_check] struct shared_memory_ctx *sm_ctx);
+    };
+};
