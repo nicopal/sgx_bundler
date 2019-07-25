@@ -8,6 +8,8 @@
 
 #include "sample.h"
 
+#define MEMO_CACH_SIZE 10
+
 TEST(cache, 1) {
     // Contract: Only the first call to SGX_add_and_count should triggert an ecall which will incremenet the counter by 1. The other 2 calls should hit in the function cache.
 
@@ -53,13 +55,13 @@ TEST(cache, 2) {
 
     uint32_t tmp[2];
     for(int j = 0; j < 10; ++j) {
-        for(int i = 0; i < CACHE_SIZE; ++i) {
+        for(int i = 0; i < MEMO_CACH_SIZE; ++i) {
             tmp[0] = 0, tmp[1] = i;
             HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = { .on = true, .return_type = 'd', .hash = hcall_hash_words(tmp, 2, 0) }), VAR(x, 'd'), VAR(i, 'd'), PTR(&counter), VAR(res, 'd'));
             ASSERT_EQ(res, i);
         }
     }
-    ASSERT_EQ(counter, CACHE_SIZE);
+    ASSERT_EQ(counter, MEMO_CACH_SIZE);
 
     struct shared_memory_ctx *sm_ctx = hotcall_test_get_context();
     hcall_hmap_clear(&sm_ctx->mem.functions[hotcall_ecall_add_and_count]->cache);
@@ -77,7 +79,7 @@ TEST(cache, 3) {
 
     uint32_t hash; uint32_t tmp[2];
     for(int j = 0; j < 10; ++j) {
-        for(int i = 0; i < CACHE_SIZE + 1; ++i) {
+        for(int i = 0; i < MEMO_CACH_SIZE + 1; ++i) {
             tmp[0] = 0, tmp[1] = i;
             HCALL(CONFIG(
                     .function_id = hotcall_ecall_add_and_count, .has_return = true,
@@ -87,7 +89,7 @@ TEST(cache, 3) {
             );
         }
     }
-    ASSERT_EQ(counter, (CACHE_SIZE + 1) * 10);
+    ASSERT_EQ(counter, (MEMO_CACH_SIZE + 1) * 10);
 
     struct shared_memory_ctx *sm_ctx = hotcall_test_get_context();
     hcall_hmap_clear(&sm_ctx->mem.functions[hotcall_ecall_add_and_count]->cache);

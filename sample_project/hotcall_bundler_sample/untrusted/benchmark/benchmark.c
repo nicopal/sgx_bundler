@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-volatile long unsigned dummy[L1_CACHE_SIZE];
-
 void
 benchmark(struct shared_memory_ctx *sm_ctx, unsigned int (*f_benchmark)(struct shared_memory_ctx *, unsigned int), unsigned int n_rounds, unsigned int n_iters) {
     unsigned int r, avg_median = 0;
@@ -18,11 +16,11 @@ benchmark(struct shared_memory_ctx *sm_ctx, unsigned int (*f_benchmark)(struct s
 }
 
 void
-benchmark_v2(struct shared_memory_ctx *sm_ctx, unsigned int (*f_benchmark)(struct shared_memory_ctx *, unsigned int, unsigned int, bool), unsigned int n_rounds, unsigned int n_iters, bool cold_cache) {
+benchmark_v2(struct shared_memory_ctx *sm_ctx, unsigned int (*f_benchmark)(struct shared_memory_ctx *, unsigned int, bool, unsigned int, char*), unsigned int n_rounds, unsigned int n_iters, bool cold_cache, unsigned int clear_cache_size, char *suffix) {
     unsigned int r, avg_median = 0;
     for(int n = 0; n < n_iters; ++n) {
         printf("Running iteration %d, cold cache: %s\n", n, cold_cache ? "true" : "false");
-        r = f_benchmark(sm_ctx, n_rounds, n, cold_cache);
+        r = f_benchmark(sm_ctx, n_rounds, cold_cache, clear_cache_size, suffix);
         printf("%d\n", r);
         avg_median += r;
     }
@@ -34,7 +32,17 @@ cmpfunc (const void * a, const void * b) {
    return ( *(unsigned int*)a - *(unsigned int*)b );
 }
 
+
+
+int memset_s(void *v, int c, size_t n) {
+    volatile unsigned char *p = (volatile unsigned char *) v;
+    while (n--) {
+        *p++ = c;
+    }
+    return 0;
+}
+
 void
-clear_cache() {
-    memset((void *) dummy, 1, 8 * L1_CACHE_SIZE);
+clear_cache(char *buf, unsigned int buf_size) {
+    memset_s((void *) buf, 1, buf_size);
 }

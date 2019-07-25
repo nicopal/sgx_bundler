@@ -12,7 +12,7 @@ benchmark_for(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
     unsigned int warmup = n_rounds / 10;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
         unsigned int n_iters = 10000;
         int xs[n_iters] = { 0 };
 
@@ -58,7 +58,7 @@ benchmark_filter(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
     }
     int y = 2;
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
 
         unsigned int out_length = 0;
         int ys[n_iters] = { 0 };
@@ -115,7 +115,7 @@ benchmark_for_each(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
     }
 
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
 
         BEGIN
 
@@ -139,7 +139,7 @@ benchmark_if_naive(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
     unsigned int warmup = n_rounds / 10;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
         BEGIN
         bool res;
         //HCALL(sm_ctx, ecall_always_true, false, &res, 0, NULL);
@@ -169,7 +169,7 @@ benchmark_if_optimized(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) 
     unsigned int warmup = n_rounds / 10;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
         unsigned n_iters = 100, out_length;
         int xs[n_iters] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         int ys[n_iters] = { 0 };

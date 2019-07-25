@@ -11,7 +11,7 @@ benchmark_cache(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
     unsigned int warmup = n_rounds / 10;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        clear_cache();
+        //clear_cache();
         int x = 0, y = 0, counter = 0, res;
         const uint32_t tmp[] = { x, y };
 

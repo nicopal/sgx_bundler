@@ -61,13 +61,17 @@ int SGX_CDECL main(int argc, char *argv[])
         return hotcall_run_tests(&sm_ctx);
     }
 
-
-    if(argc < 2) {
-        printf("No benchmark specified.\n");
+    if(argc < 2 || strcmp(argv[1], "-b")) {
+        printf("Please specify if you want to run tests(-t) or benchmark(-b).\n");
         return 0;
     }
 
-    char *benchmark_name = (char *) argv[1];
+    char *output_path = (char *) argv[2];
+    char *benchmark_name = (char *) argv[3];
+    unsigned int n_iters = atoi(argv[4]);
+    bool cold_cache = argc > 5 && !strcmp(argv[5], "-cold") ? true : false;
+    int cache_clear_size_multiple = argc > 6 ? atoi(argv[6]) : 1;
+    printf("multiple %d\n", cache_clear_size_multiple);
 
     printf("Running benchmark %s.\n", benchmark_name);
 
@@ -76,35 +80,32 @@ int SGX_CDECL main(int argc, char *argv[])
         hotcall_init(&sm_ctx, global_eid);
     }
 
-    unsigned int n_iters = atoi(argv[2]);
-    bool cold_cache = argc > 3 && !strcmp(argv[3], "-cold") ? true : false;
-
     if(!strcmp(benchmark_name, "map")) {
         benchmark(&sm_ctx, benchmark_map, n_iters, ROUNDS);
     } else if(!strcmp(benchmark_name, "hotcall_0")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_0, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_0, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_0")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_0, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_0, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_1")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_1, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_1")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_1, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_3")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_3, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_3, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_3")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_3, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_3, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_5")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_5, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_5")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_5, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_10")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_10, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_10, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_10")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_10, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_10, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_15")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_15, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_15, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_15")) {
-        benchmark_v2(&sm_ctx, benchmark_vanilla_15, n_iters, ROUNDS, cold_cache);
+        benchmark_v2(&sm_ctx, benchmark_vanilla_15, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "for_each")) {
         benchmark(&sm_ctx, benchmark_for_each, n_iters, ROUNDS);
     }
