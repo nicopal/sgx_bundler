@@ -56,26 +56,21 @@ hotcall_destroy(struct shared_memory_ctx *sm_ctx);
 
 static inline void
 make_hotcall(struct hotcall *hcall) {
+    sgx_spin_lock(&hcall->spinlock);
     hcall->is_done  = false;
     hcall->run      = true;
+    sgx_spin_unlock(&hcall->spinlock);
     while (1) {
-
         __asm
-        __volatile(
-          "pause"
-        );
-
+        __volatile("pause");
         sgx_spin_lock(&hcall->spinlock);
         if (hcall->is_done) {
             sgx_spin_unlock(&hcall->spinlock);
             break;
         }
         sgx_spin_unlock(&hcall->spinlock);
-
         __asm
-        __volatile(
-          "pause"
-        );
+        __volatile("pause");
     }
 }
 
