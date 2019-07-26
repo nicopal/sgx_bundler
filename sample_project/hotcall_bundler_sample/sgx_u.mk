@@ -4,8 +4,8 @@ SGX_MODE ?= SIM
 SGX_ARCH ?= x64
 UNTRUSTED_DIR=untrusted
 
-HOTCALL_BUNDLER_LIB_PATH := /home/jakob/ovs-sgx/hotcall_bundler/src
-HOTCALL_BUNDLER_INCLUDE_PATH = /home/jakob/ovs-sgx/hotcall_bundler/include
+HOTCALL_BUNDLER_LIB_PATH := /home/jakob/hotcall_bundler/src
+HOTCALL_BUNDLER_INCLUDE_PATH = /home/jakob/hotcall_bundler/include
 
 ifeq ($(shell getconf LONG_BIT), 32)
 	SGX_ARCH := x86
@@ -71,7 +71,7 @@ App_C_Files := $(UNTRUSTED_DIR)/sample.c \
 			   $(UNTRUSTED_DIR)/benchmark/benchmark_if.c
 
 App_Include_Paths := -Iinclude -I$(UNTRUSTED_DIR) -I$(SGX_SDK)/include -I$(HOTCALL_BUNDLER_INCLUDE_PATH) \
-	-I$(HOTCALL_BUNDLER_LIB_PATH)/untrusted -I/home/jakob/ovs-sgx/benchmark/include -I$(HOTCALL_BUNDLER_LIB_PATH)/lib -I$(HOTCALL_BUNDLER_LIB_PATH)/trusted/static_trusted/cache
+	-I$(HOTCALL_BUNDLER_LIB_PATH)/untrusted  -I$(HOTCALL_BUNDLER_LIB_PATH)/lib -I$(HOTCALL_BUNDLER_LIB_PATH)/trusted/static_trusted/cache
 
 App_C_Flags := $(SGX_COMMON_CFLAGS) -fPIC -Wno-attributes $(App_Include_Paths)
 

@@ -3,8 +3,8 @@ SGX_SDK ?= /opt/intel/sgxsdk
 SGX_MODE ?= SIM
 SGX_ARCH ?= x64
 
-HOTCALL_BUNDLER_INCLUDE_PATH = /home/jakob/ovs-sgx/hotcall_bundler/include
-HOTCALL_BUNDLER_LIB_PATH := /home/jakob/ovs-sgx/hotcall_bundler/src
+HOTCALL_BUNDLER_INCLUDE_PATH = /home/jakob/hotcall_bundler/include
+HOTCALL_BUNDLER_LIB_PATH := /home/jakob/hotcall_bundler/src
 
 ifeq ($(shell getconf LONG_BIT), 32)
 	SGX_ARCH := x86

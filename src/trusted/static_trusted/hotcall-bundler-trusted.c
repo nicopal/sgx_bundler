@@ -136,10 +136,10 @@ hotcall_bundler_start(struct shared_memory_ctx *sm_ctx){
 
         if (sm_ctx->hcall.run) {
             sm_ctx->hcall.run = false;
-            /*if(sm_ctx->hcall.batch) exit_code = hotcall_execute_bundle(sm_ctx->hcall.batch);
-            else exit_code = hotcall_execute_ecall(sm_ctx->hcall.ecall, &sm_ctx->mem);*/
+            if(sm_ctx->hcall.batch) exit_code = hotcall_execute_bundle(sm_ctx->hcall.batch);
+            else exit_code = hotcall_execute_ecall(sm_ctx->hcall.ecall, &sm_ctx->mem);
             sm_ctx->hcall.is_done = true;
-            //if(exit_code) goto exit;
+            if(exit_code) goto exit;
         }
 
         sgx_spin_unlock(&sm_ctx->hcall.spinlock);
