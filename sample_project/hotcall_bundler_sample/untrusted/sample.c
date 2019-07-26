@@ -30,8 +30,11 @@ void ocall_print(const char *str)
 
 int initialize_enclave(void)
 {
+    sgx_launch_token_t token = {0};
+    int token_updated;
+    sgx_misc_attribute_t attr;
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    ret = sgx_create_enclave(HOTCALL_BUNDLER_SAMPLE_FILENAME, SGX_DEBUG_FLAG, NULL, NULL, &global_eid, NULL);
+    ret = sgx_create_enclave(HOTCALL_BUNDLER_SAMPLE_FILENAME, SGX_DEBUG_FLAG, &token, &token_updated, &global_eid, &attr);
     if (ret != SGX_SUCCESS) {
         printf("Failed to initialize enclave.\n");
         return -1;
