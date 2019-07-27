@@ -6,8 +6,9 @@
 
 #define _BEGIN_FOR(SM_CTX, ID, CONFIG) \
     struct for_config CAT2(FOR_CONFIG_,ID) = CONFIG; \
-    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { 0 }; \
-    hotcall_enqueue_item(SM_CTX, QUEUE_ITEM_TYPE_FOR_BEGIN, &CAT2(FOR_CONFIG_,ID), NULL, &CAT2(QUEUE_ITEM_, ID));\
+    struct hotcall_for_start ID = { &CAT2(FOR_CONFIG_,ID) }; \
+    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { QUEUE_ITEM_TYPE_FOR_BEGIN, .call = { .for_s = &ID }}; \
+    hotcall_enqueue_item(SM_CTX, &CAT2(QUEUE_ITEM_, ID));\
 
 
 
@@ -15,11 +16,12 @@
     _BEGIN_FOR(_sm_ctx, UNIQUE_ID, CONFIG)
 
 
-#define _END_FOR(ID) \
-    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { 0 }; \
-    hotcall_enqueue_item(_sm_ctx, QUEUE_ITEM_TYPE_FOR_END, NULL, NULL, &CAT2(QUEUE_ITEM_, ID));\
+#define _END_FOR(SM_CTX, ID) \
+    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { QUEUE_ITEM_TYPE_FOR_END }; \
+    hotcall_enqueue_item(_sm_ctx, &CAT2(QUEUE_ITEM_, ID));\
+    calculate_loop_length(&(SM_CTX)->hcall, QUEUE_ITEM_TYPE_FOR_BEGIN);
 
-#define END_FOR() _END_FOR(UNIQUE_ID)
+#define END_FOR() _END_FOR(_sm_ctx, UNIQUE_ID)
 
 
 struct for_config {

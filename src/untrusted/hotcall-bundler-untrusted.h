@@ -10,24 +10,14 @@
 #include "shared_memory_ctx.h"
 #include "sgx_eid.h"
 
-#ifdef BATCHING
-#define ASYNC(X) X
-#define _ASYNC(SM_CTX, X) X || is_hotcall_in_progress(&(SM_CTX)->hcall)
-#else
-#define ASYNC(X) false
-#define _ASYNC(SM_CTX, X) false || is_hotcall_in_progress(&(SM_CTX)->hcall)
-#endif
-
 #define BUNDLE_END() \
     hotcall_bundle_flush(_sm_ctx);\
-    _sm_ctx->hcall.hotcall_in_progress = false;\
     _sm_ctx->hcall.error = _sm_ctx->hcall.batch->error; \
     _sm_ctx->hcall.batch = NULL
 
 #define _BUNDLE_BEGIN(ID) \
     struct hotcall_batch ID = { 0 }; \
     _sm_ctx->hcall.batch = &ID;\
-    _sm_ctx->hcall.hotcall_in_progress = true;\
     _sm_ctx->hcall.error = 0
 
 #define BUNDLE_BEGIN() _BUNDLE_BEGIN(UNIQUE_ID)
@@ -35,20 +25,12 @@
 #define CHAIN_BEGIN() hotcall_bundle_chain_begin(_sm_ctx)
 #define CHAIN_CLOSE() hotcall_bundle_chain_close(_sm_ctx)
 
-#define BUNDLE_IF_TRUE(CONDITION) \
-    _sm_ctx->hcall.batch->ignore_hcalls = CONDITION ? false : true;
-#define BUNDLE_IF_ELSE() \
-    _sm_ctx->hcall.batch->ignore_hcalls = !_sm_ctx->hcall.batch->ignore_hcalls;
-#define BUNDLE_IF_END() \
-    _sm_ctx->hcall.batch->ignore_hcalls = false;
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void
-hotcall_enqueue_item(struct shared_memory_ctx *sm_ctx, uint8_t item_type, void *config, struct parameter *params, struct ecall_queue_item *item);
+bool
+hotcall_enqueue_item(struct shared_memory_ctx *sm_ctx, struct ecall_queue_item *item);
 void
 hotcall_init(struct shared_memory_ctx *sm_ctx, sgx_enclave_id_t _global_eid);
 void
@@ -79,21 +61,14 @@ hotcall_bundle_flush(struct shared_memory_ctx *sm_ctx) {
     make_hotcall(&sm_ctx->hcall);
 }
 
-static inline bool
-is_hotcall_in_progress(struct hotcall *hcall) {
-    return hcall->hotcall_in_progress;
-}
-
 static inline void
 hotcall_bundle_begin(struct shared_memory_ctx *sm_ctx, struct hotcall_batch *batch) {
     sm_ctx->hcall.batch = batch;
-    sm_ctx->hcall.hotcall_in_progress = true;
 }
 
 static inline void
 hotcall_bundle_end(struct shared_memory_ctx *sm_ctx) {
     hotcall_bundle_flush(sm_ctx);
-    sm_ctx->hcall.hotcall_in_progress = false;
     sm_ctx->hcall.batch = NULL;
 }
 
@@ -130,10 +105,10 @@ calculate_loop_length(struct hotcall *hcall, int type) {
         }
     }
     switch(type) {
-        case QUEUE_ITEM_TYPE_FOR_BEGIN: it->call.for_s.config->loop_end = batch->top; break;
+        case QUEUE_ITEM_TYPE_FOR_BEGIN: it->call.for_s->config->loop_end = batch->top; break;
         case QUEUE_ITEM_TYPE_WHILE_BEGIN:
-            it->call.while_s.config->loop_start = it->next;
-            it->call.while_s.config->loop_end = batch->top;
+            it->call.while_s->config->loop_start = it->next;
+            it->call.while_s->config->loop_end = batch->top;
             break;
         default: SWITCH_DEFAULT_REACHED
     }
@@ -153,12 +128,12 @@ calculate_if_body_length(struct shared_memory_ctx *sm_ctx) {
 
         if(it->type == QUEUE_ITEM_TYPE_IF_ELSE && nesting == 0) {
             else_branch = it->next;
-            it->call.tife.config->if_end = batch->top;
+            it->call.tife->config->if_end = batch->top;
         }
     }
-    it->call.tif.config->else_branch = else_branch;
-    it->call.tif.config->then_branch = it->next;
-    it->call.tif.config->if_end = batch->top;
+    it->call.tif->config->else_branch = else_branch;
+    it->call.tif->config->then_branch = it->next;
+    it->call.tif->config->if_end = batch->top;
 }
 
 
@@ -166,7 +141,7 @@ static inline
 struct ecall_queue_item * get_fcall_(struct shared_memory_ctx *sm_ctx, struct hotcall_function_config *config, struct parameter *params, struct ecall_queue_item *item) {
     item->type = QUEUE_ITEM_TYPE_FUNCTION;
     struct hotcall_function *fcall;
-    fcall = &item->call.fc;
+    fcall = item->call.fc;
     fcall->config = config;
     fcall->params = params;
 
@@ -186,13 +161,13 @@ chain_operators(struct shared_memory_ctx *sm_ctx, struct parameter *params) {
     prev_item = sm_ctx->hcall.batch->top->prev;
     switch(prev_item->type) {
         case QUEUE_ITEM_TYPE_FILTER:
-            params[0] = prev_item->call.fi.params[prev_item->call.fi.config->n_params - 1];
+            params[0] = prev_item->call.fi->params[prev_item->call.fi->config->n_params - 1];
             break;
         case QUEUE_ITEM_TYPE_MAP:
-            params[0] = prev_item->call.ma.params[prev_item->call.ma.config->n_params - 1];
+            params[0] = prev_item->call.ma->params[prev_item->call.ma->config->n_params - 1];
             break;
         case QUEUE_ITEM_TYPE_REDUCE:
-            params[0] = prev_item->call.ma.params[prev_item->call.re.config->n_params - 1];
+            params[0] = prev_item->call.ma->params[prev_item->call.re->config->n_params - 1];
             break;
         default:
             printf("default chaining..\n");

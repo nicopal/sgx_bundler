@@ -15,11 +15,9 @@
 #include "hotcall_reduce.h"
 #include "hotcall_if.h"
 #include "hotcall_error.h"
-#include "hotcall_assign_variable.h"
 #include "hotcall_function.h"
 #include "hotcall_assert.h"
 #include "hotcall_cache.h"
-
 
 #define QUEUE_ITEM_TYPE_IF_NULL 1
 #define QUEUE_ITEM_TYPE_DESTROY 3
@@ -42,25 +40,19 @@
 #define QUEUE_ITEM_TYPE_ASSERT 23
 #define QUEUE_ITEM_TYPE_ASSERT_FALSE 24
 
-#define MAX_FCS 200
-#define MAX_TS 200
-#define MAX_N_VARIABLES 5
-
 union hcall {
-    struct hotcall_if tif;
-    struct hotcall_for_start for_s;
-    struct hotcall_for_each tor;
-    struct hotcall_filter fi;
-    struct hotcall_do_while dw;
-    struct hotcall_while_start while_s;
-    struct hotcall_map ma;
-    struct hotcall_error err;
-    struct hotcall_reduce re;
-    struct hotcall_function fc;
-    struct hotcall_assign_variable var;
-    struct hotcall_assign_pointer ptr;
-    struct hotcall_if_else tife;
-    struct hotcall_assert as;
+    struct hotcall_if *tif;
+    struct hotcall_for_start *for_s;
+    struct hotcall_for_each *tor;
+    struct hotcall_filter *fi;
+    struct hotcall_do_while *dw;
+    struct hotcall_while_start *while_s;
+    struct hotcall_map *ma;
+    struct hotcall_error *err;
+    struct hotcall_reduce *re;
+    struct hotcall_function *fc;
+    struct hotcall_if_else *tife;
+    struct hotcall_assert *as;
 };
 
 struct ecall_queue_item {
@@ -71,22 +63,19 @@ struct ecall_queue_item {
 };
 
 struct hotcall_batch {
-    struct ecall_queue_item *queue; //[MAX_FCS];
+    struct ecall_queue_item *queue;
     struct ecall_queue_item *top;
     unsigned int queue_len;
     int error;
-    bool ignore_hcalls;
 };
 
 struct hotcall {
-    sgx_spinlock_t spinlock;
-    bool is_done;
-    bool run;
-
     struct hotcall_batch *batch;
     struct ecall_queue_item *ecall;
     int error;
-    bool hotcall_in_progress;
+    sgx_spinlock_t spinlock;
+    bool is_done;
+    bool run;
     bool is_inside_chain;
 };
 
@@ -94,15 +83,12 @@ struct memoize {
     unsigned int function_cache_size[256];
     struct function_cache_ctx *functions[256];
     unsigned int max_n_function_caches;
-
 };
 
 
 struct shared_memory_ctx {
     struct hotcall hcall;
-    char pad[64];
     struct memoize mem;
-    void *custom_object_ptr[MAX_N_VARIABLES];
 };
 
 #endif

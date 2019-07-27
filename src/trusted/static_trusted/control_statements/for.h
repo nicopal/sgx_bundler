@@ -20,7 +20,7 @@ update_loop_body_vector_variables(struct loop_stack_item *loop_stack, unsigned i
 
 static inline void
 hotcall_handle_for_begin(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
-    struct hotcall_for_start *for_s = &qi->call.for_s;
+    struct hotcall_for_start *for_s = qi->call.for_s;
     unsigned int loop_stack_pos = queue_ctx->loop_stack_pos;
     struct loop_stack_item *loop_stack = queue_ctx->loop_stack;
 

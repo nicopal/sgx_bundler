@@ -13,8 +13,6 @@ TEST(integration,1) {
     int buf_size = 15;
     unsigned int n = 0;
 
-    //struct parameter vec1[] = { VAR(buffer, 'd'), VECTOR_v2(&vec1[0], &n) }, p1 = vec1[1];
-    //struct parameter vec2[] = { VAR(map_out, 'd'), VECTOR_v2(&vec2[0], &n) }, p2 = vec2[1];
 
     BUNDLE_BEGIN();
 

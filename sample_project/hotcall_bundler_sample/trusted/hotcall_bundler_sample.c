@@ -45,23 +45,9 @@ void *call_table[CALL_TABLE_CAPACITY] = {
 };
 
 void
-execute_function(uint8_t function_id, unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
-    void (*f)(unsigned int n_iters, unsigned int n_params, void *[n_params][n_iters]);
-    f = call_table[function_id];
-    #ifdef SGX_DEBUG
-    if(!f) {
-        printf("unknown hotcall function %d.\n", function_id);
-    }
-    #endif
-    f(n_iters, n_params, args);
-}
-
-void
 ecall_configure_hotcall() {
     struct hotcall_config conf = {
-        .execute_function_legacy = NULL,
-        .execute_function = execute_function,
-        .n_spinlock_jobs = 0,
+        .call_table = call_table
     };
     struct hotcall_config *config = malloc(sizeof(struct hotcall_config));
     memcpy(config, &conf, sizeof(struct hotcall_config));

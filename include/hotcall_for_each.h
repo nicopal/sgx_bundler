@@ -9,9 +9,10 @@
         __VA_ARGS__\
     }; \
     struct for_each_config CAT2(FOR_EACH_CONFIG_,ID) = CONFIG;\
-    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { 0 }; \
+    struct hotcall_for_each ID = { CAT2(FOR_EACH_ARG_,ID), &CAT2(FOR_EACH_CONFIG_,ID) };\
+    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { QUEUE_ITEM_TYPE_FOR_EACH, .call = { .tor = &ID }}; \
     CAT2(FOR_EACH_CONFIG_,ID).n_params = sizeof(CAT2(FOR_EACH_ARG_,ID))/sizeof(struct parameter);\
-    hotcall_enqueue_item(SM_CTX, QUEUE_ITEM_TYPE_FOR_EACH, &CAT2(FOR_EACH_CONFIG_,ID), CAT2(FOR_EACH_ARG_,ID), &CAT2(QUEUE_ITEM_, ID))
+    hotcall_enqueue_item(SM_CTX, &CAT2(QUEUE_ITEM_, ID))
 
 
 #define FOR_EACH(CONFIG, ...) \
@@ -24,8 +25,8 @@ struct for_each_config {
 };
 
 struct hotcall_for_each {
-    struct for_each_config *config;
     struct parameter *params;
+    struct for_each_config *config;
 };
 
 #endif

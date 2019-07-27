@@ -21,16 +21,17 @@ hotcall_register_config(struct hotcall_config *config) {
 
 static inline void
 hotcall_handle_function(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
-    struct hotcall_function *fc = &qi->call.fc;
+    struct hotcall_function *fc = qi->call.fc;
     unsigned int loop_stack_pos = queue_ctx->loop_stack_pos;
-    parse_function_arguments(fc->params, fc->config->n_params, loop_stack_pos > 0 ? queue_ctx->loop_stack[loop_stack_pos - 1].offset : 0, fc->args);
-    execute_function(hotcall_config, fc->config->function_id, 1, fc->config->n_params, fc->args);
+    void *args[fc->config->n_params][1];
+    parse_function_arguments(fc->params, fc->config->n_params, loop_stack_pos > 0 ? queue_ctx->loop_stack[loop_stack_pos - 1].offset : 0, args);
+    execute_function(hotcall_config, fc->config->function_id, 1, fc->config->n_params, args);
 }
 
 static inline void
 hotcall_handle_error(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
     batch_status->exit_batch = true;
-    batch_status->error = qi->call.err.config->error_code;
+    batch_status->error = qi->call.err->config->error_code;
 }
 
 static inline void
@@ -60,6 +61,7 @@ static void *lookup_table[256] = {
 };
 
 
+/*
 static inline void
 execute_tasks(struct shared_memory_ctx *sm_ctx, struct hotcall_config *hotcall_config) {
     for(int i = 0; i < hotcall_config->n_spinlock_jobs; ++i) {
@@ -70,7 +72,7 @@ execute_tasks(struct shared_memory_ctx *sm_ctx, struct hotcall_config *hotcall_c
         }
         hotcall_config->spin_lock_task_count[i]++;
     }
-}
+}*/
 
 static int
 hotcall_execute_bundle(struct hotcall_batch *batch) {
@@ -81,7 +83,6 @@ hotcall_execute_bundle(struct hotcall_batch *batch) {
     unsigned int queue_len = batch->queue_len;
     struct queue_context queue_ctx = { .len = queue_len };
     struct batch_status status = { 0 };
-
 
     register struct ecall_queue_item *item = batch->queue;
     while(item) {
@@ -106,14 +107,17 @@ hotcall_execute_ecall(struct ecall_queue_item *qi, struct memoize *mem) {
     if(qi->type == QUEUE_ITEM_TYPE_DESTROY) {
         return -1;
     }
-    struct hotcall_function *fc = &qi->call.fc;
-    parse_function_arguments(fc->params, fc->config->n_params, 0, fc->args);
-    execute_function(hotcall_config, fc->config->function_id, 1, fc->config->n_params, fc->args);
-    if(fc->config->memoize.on) {
-        memoize_value(mem, fc->config, fc->args[fc->config->n_params - 1][0], fc->args[fc->config->n_params - 2][0]);
+    struct hotcall_function *fc = qi->call.fc;
+    struct hotcall_function_config *config = fc->config;
+    unsigned int n_params = config->n_params;
+    void *args[n_params][1];
+    if(n_params) parse_function_arguments(fc->params, n_params, 0, args);
+    execute_function(hotcall_config, config->function_id, 1, n_params, args);
+    if(config->memoize.on) {
+        memoize_value(mem, config, args[n_params - 1][0], args[n_params - 2][0]);
     }
-    for(int i = 0; i < fc->config->memoize_invalidate.n_caches_to_invalidate; ++i) {
-        invalidate_cache_line(mem, &fc->config->memoize_invalidate.caches[i], fc->args[fc->config->n_params - 1][0]);
+    for(int i = 0; i < config->memoize_invalidate.n_caches_to_invalidate; ++i) {
+        invalidate_cache_line(mem, &config->memoize_invalidate.caches[i], args[n_params - 1][0]);
     }
     return 0;
 }

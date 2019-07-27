@@ -5,7 +5,7 @@
 
 void
 hotcall_handle_for_each(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
-    struct hotcall_for_each *tor = &qi->call.tor;
+    struct hotcall_for_each *tor = qi->call.tor;
 
     unsigned int n_iters = *tor->config->n_iters;
     unsigned int n_params = tor->config->n_params;

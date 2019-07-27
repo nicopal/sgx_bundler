@@ -6,7 +6,7 @@
 
 static inline void
 hotcall_handle_assert(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
-    struct hotcall_assert *as = &qi->call.as;
+    struct hotcall_assert *as = qi->call.as;
     int res;
 
     switch(as->param->type) {

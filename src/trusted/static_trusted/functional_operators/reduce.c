@@ -121,7 +121,7 @@ combine_result(char op, char fmt, void *accumulator, void *ret, int n) {
 void
 hotcall_handle_reduce(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
 
-    struct hotcall_reduce *re = &qi->call.re;
+    struct hotcall_reduce *re = qi->call.re;
 
     unsigned int n_params = re->config->n_params;
     //struct parameter *accumulator = &re->params[n_params - 1];
@@ -160,7 +160,7 @@ hotcall_handle_reduce(struct ecall_queue_item *qi, const struct hotcall_config *
     void *args[n_params][1];
     for(int i = 0; i < in_len; ++i) {
         parse_function_arguments(re->params, n_params, i, args);
-        hotcall_config->execute_function(re->config->function_id, 1, n_params, args);
+        execute_function(hotcall_config, re->config->function_id, 1, n_params, args);
         combine_result(re->config->op, re->params[0].value.vector.fmt, &accumulator, args[n_params - 1][0], i);
     }
     *(int *) re->params[n_params - 1].value.variable.arg = accumulator;

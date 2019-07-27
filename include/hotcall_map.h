@@ -9,9 +9,13 @@
         __VA_ARGS__\
     }; \
     struct map_config CAT2(MAP_CONFIG_,ID) = CONFIG;\
-    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { 0 }; \
+    struct hotcall_map ID = { CAT2(MAP_ARG_,ID), &CAT2(MAP_CONFIG_,ID) };\
+    struct ecall_queue_item CAT2(QUEUE_ITEM_, ID) = { QUEUE_ITEM_TYPE_MAP, .call = { .ma = &ID }}; \
     CAT2(MAP_CONFIG_,ID).n_params = sizeof(CAT2(MAP_ARG_,ID))/sizeof(struct parameter);\
-    hotcall_enqueue_item(SM_CTX, QUEUE_ITEM_TYPE_MAP, &CAT2(MAP_CONFIG_,ID), CAT2(MAP_ARG_, ID), &CAT2(QUEUE_ITEM_, ID))
+    bool CAT2(IS_FIRST_, ID) = hotcall_enqueue_item(SM_CTX, &CAT2(QUEUE_ITEM_, ID));\
+    if(is_inside_chain(SM_CTX) && !CAT2(IS_FIRST_, ID)) {\
+        chain_operators(SM_CTX,  CAT2(MAP_ARG_,ID));\
+    }
 
 
 #define MAP(CONFIG, ...) \

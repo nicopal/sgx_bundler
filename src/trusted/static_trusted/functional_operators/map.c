@@ -5,7 +5,7 @@
 
 void
 hotcall_handle_map(struct ecall_queue_item *qi, const struct hotcall_config *hotcall_config, struct queue_context *queue_ctx, struct batch_status * batch_status) {
-    struct hotcall_map *ma = &qi->call.ma;
+    struct hotcall_map *ma = qi->call.ma;
 
     const unsigned int n_params = ma->config->n_params, n_iters = *ma->config->n_iters;
 
