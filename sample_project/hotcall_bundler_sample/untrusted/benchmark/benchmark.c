@@ -46,3 +46,30 @@ void
 clear_cache(char *buf, unsigned int buf_size) {
     memset_s((void *) buf, 1, buf_size);
 }
+
+void
+create_test_folder(char *dir_path) {
+    struct stat st = { 0 };
+    if(stat(dir_path, &st) == -1) {
+        mkdir(dir_path, 0700);
+    }
+}
+
+void
+write_to_file(char *dir_path, char *file_name, unsigned int rounds[], unsigned int n_rounds) {
+    create_test_folder(dir_path);
+    char file_path[256];
+    sprintf(file_path, "%s/%s", dir_path, file_name);
+    FILE *fp;
+    fp = fopen(file_path, "a");
+    for(int i = 0; i < n_rounds; ++i) {
+        fprintf(fp, "%u\n", rounds[i]);
+    }
+    fclose(fp);
+}
+
+void
+create_file_name(char *name_buf, const char *name, bool cold_cache, unsigned int cache_clear_multiple) {
+    sprintf(name_buf, "%s_%s", name, cold_cache ? "cold" : "warm");
+    if(cold_cache) sprintf(name_buf, "%s_%u", name_buf, cache_clear_multiple);
+}

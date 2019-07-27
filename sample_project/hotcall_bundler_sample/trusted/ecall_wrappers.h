@@ -28,7 +28,7 @@ wrapper_ecall_greater_than_y(unsigned int n_iters, unsigned int n_params, void *
 static void
 wrapper_ecall_plus_one(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
     for(int i = 0; i < n_iters; ++i) {
-        ecall_plus_one((int *) args[0][i]);
+        ecall_plus_one((int *) args[i][0]);
     }
 }
 

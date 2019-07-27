@@ -21,24 +21,6 @@
 *   In order for me to completly evict the entire cache I had to write a larger block.
 */
 
-static void write_to_file(char *dir_path, char *file_name, unsigned int rounds[], unsigned int n_rounds) {
-    create_test_folder(dir_path);
-    char file_path[256];
-    sprintf(file_path, "%s/%s", dir_path, file_name);
-    FILE *fp;
-    fp = fopen(file_path, "a");
-    for(int i = 0; i < n_rounds; ++i) {
-        fprintf(fp, "%u\n", rounds[i]);
-    }
-    fclose(fp);
-}
-
-static void create_file_name(char *name_buf, const char *name, bool cold_cache, unsigned int cache_clear_multiple) {
-    sprintf(name_buf, "%s_%s", name, cold_cache ? "cold" : "warm");
-    if(cold_cache) sprintf(name_buf, "%s_%u", name_buf, cache_clear_multiple);
-}
-
-
 unsigned int
 benchmark_hotcall_0(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
     char file_path[256] = DATA_PATH;

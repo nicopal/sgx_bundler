@@ -78,13 +78,13 @@ int SGX_CDECL main(int argc, char *argv[])
 
     printf("Running benchmark %s.\n", benchmark_name);
 
-    if(strstr(benchmark_name, "hotcall") != NULL) {
+    if(strstr(benchmark_name, "vanilla") == NULL) {
         ecall_configure_hotcall(global_eid);
         hotcall_init(&sm_ctx, global_eid);
     }
 
     if(!strcmp(benchmark_name, "map")) {
-        benchmark(&sm_ctx, benchmark_map, n_iters, ROUNDS);
+        benchmark_v2(&sm_ctx, benchmark_map, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_0")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_0, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "vanilla_0")) {
@@ -110,7 +110,7 @@ int SGX_CDECL main(int argc, char *argv[])
     } else if(!strcmp(benchmark_name, "vanilla_15")) {
         benchmark_v2(&sm_ctx, benchmark_vanilla_15, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "for_each")) {
-        benchmark(&sm_ctx, benchmark_for_each, n_iters, ROUNDS);
+        benchmark_v2(&sm_ctx, benchmark_for_each, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     }
 
     if(strstr(benchmark_name, "hotcall") != NULL) {

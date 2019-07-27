@@ -9,15 +9,12 @@
 
 void
 clear_cache(char *buf, unsigned int buf_size);
-
-static inline void
-create_test_folder(char *dir_path) {
-    struct stat st = { 0 };
-    if(stat(dir_path, &st) == -1) {
-        mkdir(dir_path, 0700);
-    }
-
-}
+void
+create_test_folder(char *dir_path);
+void
+write_to_file(char *dir_path, char *file_name, unsigned int rounds[], unsigned int n_rounds);
+void
+create_file_name(char *name_buf, const char *name, bool cold_cache, unsigned int cache_clear_multiple);
 
 int
 cmpfunc (const void * a, const void * b);
@@ -67,11 +64,11 @@ benchmark_filter_optimized(struct shared_memory_ctx *sm_ctx, unsigned int n_roun
 
 
 unsigned int
-benchmark_map(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
+benchmark_map(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
 unsigned int
 benchmark_filter(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
 unsigned int
-benchmark_for_each(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
+benchmark_for_each(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
 unsigned int
 benchmark_for(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
 
