@@ -69,14 +69,14 @@ struct hotcall_batch {
     int error;
 };
 
-struct hotcall {
-    struct hotcall_batch *batch;
-    struct ecall_queue_item *ecall;
-    int error;
+  struct hotcall {
     sgx_spinlock_t spinlock;
     bool is_done;
     bool run;
     bool is_inside_chain;
+    struct hotcall_batch *batch;
+    struct ecall_queue_item *ecall;
+    int error;
 };
 
 struct memoize {

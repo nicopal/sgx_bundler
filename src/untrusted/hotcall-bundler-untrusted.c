@@ -59,6 +59,25 @@ hotcall_destroy(struct shared_memory_ctx *sm_ctx) {
     sm_ctx->hcall.ecall = NULL;
 }
 
+void
+chain_operators(struct shared_memory_ctx *sm_ctx, struct parameter *params) {
+    struct ecall_queue_item *prev_item;
+    prev_item = sm_ctx->hcall.batch->top->prev;
+    switch(prev_item->type) {
+        case QUEUE_ITEM_TYPE_FILTER:
+            params[0] = prev_item->call.fi->params[prev_item->call.fi->config->n_params - 1];
+            break;
+        case QUEUE_ITEM_TYPE_MAP:
+            params[0] = prev_item->call.ma->params[prev_item->call.ma->config->n_params - 1];
+            break;
+        case QUEUE_ITEM_TYPE_REDUCE:
+            params[0] = prev_item->call.ma->params[prev_item->call.re->config->n_params - 1];
+            break;
+        default:
+            printf("default chaining..\n");
+    }
+}
+
 bool
 hotcall_enqueue_item(struct shared_memory_ctx *sm_ctx, struct ecall_queue_item *item) {
     bool is_first_element = false;

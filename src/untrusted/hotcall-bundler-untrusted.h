@@ -35,6 +35,8 @@ void
 hotcall_init(struct shared_memory_ctx *sm_ctx, sgx_enclave_id_t _global_eid);
 void
 hotcall_destroy(struct shared_memory_ctx *sm_ctx);
+void
+chain_operators(struct shared_memory_ctx *sm_ctx, struct parameter *params);
 
 static inline void
 make_hotcall(struct hotcall *hcall) {
@@ -42,18 +44,19 @@ make_hotcall(struct hotcall *hcall) {
     hcall->is_done  = false;
     hcall->run      = true;
     sgx_spin_unlock(&hcall->spinlock);
+    
     while (1) {
         __asm
         __volatile("pause");
         sgx_spin_lock(&hcall->spinlock);
         if (hcall->is_done) {
-            sgx_spin_unlock(&hcall->spinlock);
             break;
         }
         sgx_spin_unlock(&hcall->spinlock);
         __asm
         __volatile("pause");
     }
+    sgx_spin_unlock(&hcall->spinlock);
 }
 
 static inline void
@@ -134,44 +137,6 @@ calculate_if_body_length(struct shared_memory_ctx *sm_ctx) {
     it->call.tif->config->else_branch = else_branch;
     it->call.tif->config->then_branch = it->next;
     it->call.tif->config->if_end = batch->top;
-}
-
-
-static inline
-struct ecall_queue_item * get_fcall_(struct shared_memory_ctx *sm_ctx, struct hotcall_function_config *config, struct parameter *params, struct ecall_queue_item *item) {
-    item->type = QUEUE_ITEM_TYPE_FUNCTION;
-    struct hotcall_function *fcall;
-    fcall = item->call.fc;
-    fcall->config = config;
-    fcall->params = params;
-
-    if(!sm_ctx->hcall.batch->queue) {
-        sm_ctx->hcall.batch->queue = sm_ctx->hcall.batch->top = item;
-    } else {
-        item->prev = sm_ctx->hcall.batch->top;
-        sm_ctx->hcall.batch->top->next = item;
-        sm_ctx->hcall.batch->top = item;
-    }
-}
-
-
-static inline void
-chain_operators(struct shared_memory_ctx *sm_ctx, struct parameter *params) {
-    struct ecall_queue_item *prev_item;
-    prev_item = sm_ctx->hcall.batch->top->prev;
-    switch(prev_item->type) {
-        case QUEUE_ITEM_TYPE_FILTER:
-            params[0] = prev_item->call.fi->params[prev_item->call.fi->config->n_params - 1];
-            break;
-        case QUEUE_ITEM_TYPE_MAP:
-            params[0] = prev_item->call.ma->params[prev_item->call.ma->config->n_params - 1];
-            break;
-        case QUEUE_ITEM_TYPE_REDUCE:
-            params[0] = prev_item->call.ma->params[prev_item->call.re->config->n_params - 1];
-            break;
-        default:
-            printf("default chaining..\n");
-    }
 }
 
 #ifdef __cplusplus

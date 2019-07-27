@@ -120,9 +120,12 @@ TEST(cache, 4) {
     ASSERT_EQ(x, 1);
     ASSERT_EQ(y, 2);
 
-    struct shared_memory_ctx *sm_ctx = hotcall_test_get_context();
-    struct memoize_cache c = { hotcall_ecall_add_and_count, .type = RETURN_VALUE, .invalidate_element = { .fmt = 'd'}};
-    invalidate_cache_line(&sm_ctx->mem, &c, &res);
+    struct memoize_invalidate memo_inv1 = {
+        .n_caches_to_invalidate = 1,
+        .caches = {{ hotcall_ecall_add_and_count, .type = HASH, .invalidate_element = { .hash = hash }}}
+    };
+    HCALL(CONFIG(.function_id = hotcall_ecall_foo, .has_return = false, .memoize = NULL, .memoize_invalidate = &memo_inv1));
+
 
     HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
 
@@ -159,7 +162,7 @@ TEST(cache, 4) {
     ASSERT_EQ(x, 1);
     ASSERT_EQ(y, 2);
 
-
+    struct shared_memory_ctx *sm_ctx = hotcall_test_get_context();
     hcall_hmap_clear(&sm_ctx->mem.functions[hotcall_ecall_add_and_count]->cache);
 
     hotcall_test_teardown();

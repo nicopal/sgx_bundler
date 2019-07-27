@@ -13,7 +13,6 @@
 #include "assert.h"
 #include "cache_trusted.h"
 
-
 void
 hotcall_register_config(struct hotcall_config *config) {
     hotcall_config = config;
@@ -96,7 +95,6 @@ hotcall_execute_bundle(struct hotcall_batch *batch) {
         };
         item = item->next;
     }
-
     batch_done:
 
     return 0;
@@ -107,19 +105,19 @@ hotcall_execute_ecall(struct ecall_queue_item *qi, struct memoize *mem) {
     if(qi->type == QUEUE_ITEM_TYPE_DESTROY) return -1;
     struct hotcall_function *fc = qi->call.fc;
     struct hotcall_function_config *config = fc->config;
+    uint8_t function_id = config->function_id;
     unsigned int n_params = config->n_params;
     void *args[n_params][1];
     if(n_params) parse_function_arguments(fc->params, n_params, 0, args);
-    execute_function(hotcall_config, config->function_id, 1, n_params, args);
+    execute_function(hotcall_config, function_id, 1, n_params, args);
     if(config->memoize) {
         memoize_value(mem, config, args[n_params - 1][0], args[n_params - 2][0]);
     }
     if(config->memoize_invalidate) {
       for(int i = 0; i < config->memoize_invalidate->n_caches_to_invalidate; ++i) {
-          invalidate_cache_line(mem, &config->memoize_invalidate->caches[i], args[n_params - 1][0]);
+          invalidate_cache_line(mem, &config->memoize_invalidate->caches[i], n_params > 0 ? args[n_params - 1][0] : NULL);
       }
     }
-
     return 0;
 }
 
@@ -141,8 +139,9 @@ hotcall_bundler_start(struct shared_memory_ctx *sm_ctx){
 
         if (sm_ctx->hcall.run) {
             sm_ctx->hcall.run = false;
-            if(sm_ctx->hcall.batch) exit_code = hotcall_execute_bundle(sm_ctx->hcall.batch);
-            else exit_code = hotcall_execute_ecall(sm_ctx->hcall.ecall, &sm_ctx->mem);
+            exit_code = sm_ctx->hcall.batch
+              ? hotcall_execute_bundle(sm_ctx->hcall.batch)
+              : hotcall_execute_ecall(sm_ctx->hcall.ecall, &sm_ctx->mem);
             sm_ctx->hcall.is_done = true;
             if(exit_code) goto exit;
         }
@@ -160,9 +159,7 @@ hotcall_bundler_start(struct shared_memory_ctx *sm_ctx){
         }*/
     }
 
-
     exit:
-
     sgx_spin_unlock(&sm_ctx->hcall.spinlock);
 
     return 0;
