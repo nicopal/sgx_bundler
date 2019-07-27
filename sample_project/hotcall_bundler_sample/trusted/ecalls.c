@@ -13,14 +13,14 @@ ecall_always_false() {
 }
 
 void
-ecall_foo() {
-}
+ecall_foo() {}
 
 void
 ecall_bar() {}
 
 void
 ecall_plus_one(int *x) {
+    printf("%d\n", *x);
     ++*x;
 }
 

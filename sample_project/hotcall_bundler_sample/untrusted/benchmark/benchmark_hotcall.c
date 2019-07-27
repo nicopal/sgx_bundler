@@ -362,19 +362,15 @@ benchmark_vanilla_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
 
 unsigned int
 benchmark_hotcall_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_hotcall_15";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "hotcall", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
-    unsigned int rounds[n_rounds];
+    unsigned int warmup = n_rounds/5, rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e, f, g, h, t, j, l, m, n, o, p;
         a = b = c = d = e = f = g = h = t = j = l = m = n = o = p = 0;
         BEGIN
@@ -398,13 +394,10 @@ benchmark_hotcall_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
         );
         CLOSE
         if(i >= warmup) {
-            t = GET_TIME
-            rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+            rounds[i - warmup] = GET_TIME
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }

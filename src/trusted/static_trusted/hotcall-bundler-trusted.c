@@ -104,21 +104,22 @@ hotcall_execute_bundle(struct hotcall_batch *batch) {
 
 static int
 hotcall_execute_ecall(struct ecall_queue_item *qi, struct memoize *mem) {
-    if(qi->type == QUEUE_ITEM_TYPE_DESTROY) {
-        return -1;
-    }
+    if(qi->type == QUEUE_ITEM_TYPE_DESTROY) return -1;
     struct hotcall_function *fc = qi->call.fc;
     struct hotcall_function_config *config = fc->config;
     unsigned int n_params = config->n_params;
     void *args[n_params][1];
     if(n_params) parse_function_arguments(fc->params, n_params, 0, args);
     execute_function(hotcall_config, config->function_id, 1, n_params, args);
-    if(config->memoize.on) {
+    if(config->memoize) {
         memoize_value(mem, config, args[n_params - 1][0], args[n_params - 2][0]);
     }
-    for(int i = 0; i < config->memoize_invalidate.n_caches_to_invalidate; ++i) {
-        invalidate_cache_line(mem, &config->memoize_invalidate.caches[i], args[n_params - 1][0]);
+    if(config->memoize_invalidate) {
+      for(int i = 0; i < config->memoize_invalidate->n_caches_to_invalidate; ++i) {
+          invalidate_cache_line(mem, &config->memoize_invalidate->caches[i], args[n_params - 1][0]);
+      }
     }
+
     return 0;
 }
 

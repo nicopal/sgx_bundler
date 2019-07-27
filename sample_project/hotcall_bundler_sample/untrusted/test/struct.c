@@ -316,8 +316,6 @@ TEST(struct, 9) {
 
     BUNDLE_BEGIN();
 
-    //struct parameter vec[] = { VAR(a_ptr, 'd'), STRUCT(&vec[0], .member_offset = offsetof(struct A, y)), PTR_v2(&vec[1], .dereference = true) }, p = vec[2];
-
     HCALL(CONFIG(.function_id = hotcall_ecall_plus_one), PTR(a_ptr, 'd', .dereference = false, .member_offset = offsetof(struct A, y)));
 
     BUNDLE_END();

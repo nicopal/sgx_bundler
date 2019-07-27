@@ -9,7 +9,7 @@
 
 void static inline
 memoize_value(struct memoize *mem, struct hotcall_function_config *config, void *val, void *writeback_hash) {
-    if(config->memoize.return_type == 'p') {
+    if(config->memoize->return_type == 'p') {
         if(*(void **) val == NULL) return;
     }
 
@@ -25,10 +25,10 @@ memoize_value(struct memoize *mem, struct hotcall_function_config *config, void 
         hcall_hmap_remove(&f_ctx->val_cache, &ce->hmap_val_node);
     }
 
-    uint32_t hash = config->memoize.manual_update ? *(uint32_t *) writeback_hash : config->memoize.hash;
+    uint32_t hash = config->memoize->manual_update ? *(uint32_t *) writeback_hash : config->memoize->hash;
     hcall_hmap_insert_fast(&f_ctx->cache, &ce->hmap_node, hash);
 
-    switch(config->memoize.return_type) {
+    switch(config->memoize->return_type) {
         case 'd':
             ce->type.INT_TYPE = *(int *) val;
             hcall_hmap_insert_fast(&f_ctx->val_cache, &ce->hmap_val_node, ce->type.INT_TYPE);
