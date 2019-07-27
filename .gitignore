@@ -24,3 +24,13 @@ sample_project/hotcall_bundler_sample/data/
 *.a
 *.la
 *.lo
+
+#share object
+*.so
+*.so.*
+
+#generated proxy
+*_u.c
+*_u.h
+*_t.c
+*_t.h
