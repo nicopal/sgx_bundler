@@ -17,7 +17,7 @@ TEST(integration,1) {
     BUNDLE_BEGIN();
 
     HCALL(
-        CONFIG(.function_id = hotcall_ecall_read_buffer, .has_return = true ),
+        CONFIG(.function_id = hotcall_ecall_read_buffer),
         VAR(buffer, 'd'), VAR(buf_size, 'd'), VAR(n, 'd')
     );
     MAP(

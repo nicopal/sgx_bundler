@@ -11,7 +11,7 @@ TEST(assert, 1) {
 
     BUNDLE_BEGIN();
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_always_false, .has_return = true), VAR(x, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_always_false), VAR(x, 'd'));
     ASSERT(true, error_code, VAR(x, 'd'));
     HCALL(CONFIG(.function_id = hotcall_ecall_plus_one), VAR(y, 'd'));
 
@@ -23,7 +23,7 @@ TEST(assert, 1) {
 
     BUNDLE_BEGIN();
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_always_true, .has_return = true), VAR(x, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_always_true), VAR(x, 'd'));
     ASSERT(true, error_code, VAR(x, 'd'));
     HCALL(CONFIG(.function_id = hotcall_ecall_plus_one), VAR(y, 'd'));
 

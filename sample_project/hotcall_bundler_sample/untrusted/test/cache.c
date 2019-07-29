@@ -20,14 +20,14 @@ TEST(cache, 1) {
     const uint32_t tmp[] = { x, y };
     struct memoize_config memo = { .hash = hcall_hash_words(tmp, 2, 0), .return_type = 'd' };
 
-    HCALL_MEMOIZE(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
+    HCALL_MEMOIZE(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
 
     ASSERT_EQ(res, 3);
     ASSERT_EQ(counter, 1);
     ASSERT_EQ(x, 1);
     ASSERT_EQ(y, 2);
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
 
     ASSERT_EQ(res, 3);
     ASSERT_EQ(counter, 1);
@@ -37,7 +37,7 @@ TEST(cache, 1) {
     const uint32_t tmp1[] = { y, x };
     struct memoize_config memo1 = { .hash = hcall_hash_words(tmp1, 2, 0), .return_type = 'd' };
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo1), VAR(y, 'd'), VAR(x, 'd'), PTR(&counter), VAR(res, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo1), VAR(y, 'd'), VAR(x, 'd'), PTR(&counter), VAR(res, 'd'));
 
     ASSERT_EQ(res, 3);
     ASSERT_EQ(counter, 2);
@@ -62,7 +62,7 @@ TEST(cache, 2) {
         for(int i = 0; i < MEMO_CACH_SIZE; ++i) {
             tmp[0] = 0, tmp[1] = i;
             struct memoize_config memo = { .hash = hcall_hash_words(tmp, 2, 0), 'd' };
-            HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(i, 'd'), PTR(&counter), VAR(res, 'd'));
+            HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo), VAR(x, 'd'), VAR(i, 'd'), PTR(&counter), VAR(res, 'd'));
             ASSERT_EQ(res, i);
         }
     }
@@ -88,7 +88,7 @@ TEST(cache, 3) {
             tmp[0] = 0, tmp[1] = i;
             struct memoize_config memo = { .hash = hcall_hash_words(tmp, 2, 0), 'd' };
             HCALL(CONFIG(
-                    .function_id = hotcall_ecall_add_and_count, .has_return = true,
+                    .function_id = hotcall_ecall_add_and_count,
                     .memoize = &memo
                 ),
                 VAR(x, 'd'), VAR(i, 'd'), PTR(&counter), VAR(res, 'd')
@@ -113,7 +113,7 @@ TEST(cache, 4) {
     const uint32_t tmp[] = { x, y };
     uint32_t hash = hcall_hash_words(tmp, 2, 0);
     struct memoize_config memo = { .hash = hash, .return_type = 'd' };
-    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
 
     ASSERT_EQ(res, 3);
     ASSERT_EQ(counter, 1);
@@ -124,10 +124,10 @@ TEST(cache, 4) {
         .n_caches_to_invalidate = 1,
         .caches = {{ hotcall_ecall_add_and_count, .type = HASH, .invalidate_element = { .hash = hash }}}
     };
-    HCALL(CONFIG(.function_id = hotcall_ecall_foo, .has_return = false, .memoize = NULL, .memoize_invalidate = &memo_inv1));
+    HCALL(CONFIG(.function_id = hotcall_ecall_foo, .memoize = NULL, .memoize_invalidate = &memo_inv1));
 
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
 
     ASSERT_EQ(res, 3);
     ASSERT_EQ(counter, 2);
@@ -141,7 +141,7 @@ TEST(cache, 4) {
     struct memoize_invalidate memo_inv = { .n_caches_to_invalidate = 1, .caches = {{hotcall_ecall_add_and_count, .type = RETURN_VALUE, .invalidate_element = { .fmt = 'd' }}}};
     HCALL(
         CONFIG(
-                .function_id = hotcall_ecall_add_and_count, .has_return = true,
+                .function_id = hotcall_ecall_add_and_count,
                 .memoize = &memo1,
                 .memoize_invalidate = &memo_inv
         ),
@@ -153,7 +153,7 @@ TEST(cache, 4) {
     ASSERT_EQ(y, 2);
 
     HCALL(
-        CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo),
+        CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo),
         VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd')
     );
 
@@ -183,7 +183,6 @@ TEST(cache, 5) {
     HCALL(
         CONFIG(
             .function_id = hotcall_ecall_add_and_count,
-            .has_return = true,
             .memoize = &memo,
             .memoize_invalidate = &memo_inv
         ), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd')
@@ -192,7 +191,6 @@ TEST(cache, 5) {
     HCALL(
         CONFIG(
             .function_id = hotcall_ecall_add_and_count,
-            .has_return = true,
             .memoize = &memo,
         ), VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd')
     );

@@ -21,7 +21,7 @@ TEST(error,1) {
 
     int x = 0;
     bool res;
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_false, .has_return = true ), VAR(res, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_false), VAR(res, 'b'));
     IF((struct if_config) { .predicate_fmt = "b" }, VAR(res, 'b'));
     THEN
     ELSE
@@ -54,7 +54,7 @@ TEST(error, 2) {
 
     int x = 0;
     bool res;
-    HCALL(CONFIG(.function_id = hotcall_ecall_always_false, .has_return = true), VAR(res, 'b'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_always_false), VAR(res, 'b'));
     IF((struct if_config) { .predicate_fmt = "!b" }, VAR(res, 'b'));
     THEN
         HCALL(CONFIG(.function_id = hotcall_ecall_plus_one), VAR(x, 'b'));

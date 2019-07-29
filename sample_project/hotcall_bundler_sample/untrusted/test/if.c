@@ -18,9 +18,9 @@ TEST(if,1) {
 
     BUNDLE_BEGIN();
 
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_false, .has_return = true ), VAR(res1, 'b'));
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_true, .has_return = true ), VAR(res2, 'b'));
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_true, .has_return = true ), VAR(res3, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_false), VAR(res1, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_true), VAR(res2, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_true), VAR(res3, 'b'));
     IF(
         ((struct if_config) { .predicate_fmt = "!b&(b|b)&b" }),
         PTR(ptr), VAR(res1, 'b'), VAR(res2, 'b'), VAR(res3, 'b')
@@ -50,7 +50,7 @@ TEST(if,2) {
 
     bool b;
     struct parameter function_parameters[] = { VAR(b, 'b') };
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_false, .has_return = true ), VAR(res, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_false), VAR(res, 'b'));
     IF(
         ((struct if_config) { .predicate_fmt = "b|!b" }),
         VAR(res, 'b'),
@@ -81,7 +81,7 @@ TEST(if,3) {
 
     BUNDLE_BEGIN();
 
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_false, .has_return = true ), VAR(res, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_false), VAR(res, 'b'));
     IF(
         ((struct if_config) { .predicate_fmt = "b|!b" }),
         VAR(res, 'b' ), FUNC( .function_id = hotcall_ecall_greater_than_y, .params = function_parameters, .n_params = 2 )
@@ -116,7 +116,7 @@ TEST(if,4) {
 
     BUNDLE_BEGIN();
 
-    HCALL(CONFIG( .function_id = hotcall_ecall_always_true, .has_return = true ), VAR(res, 'b'));
+    HCALL(CONFIG( .function_id = hotcall_ecall_always_true), VAR(res, 'b'));
     IF(
         ((struct if_config) { .predicate_fmt = "b" }),
         VAR(res, 'b')
@@ -354,7 +354,7 @@ TEST(if,12) {
     int xs[n_iters] = { 0 };
     int x = 0;
     bool always_true;
-    HCALL(CONFIG(.function_id = hotcall_ecall_always_true, .has_return = true), VAR(always_true, 'b'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_always_true), VAR(always_true, 'b'));
 
     IF(
         ((struct if_config) { .predicate_fmt = "b" }), VAR(always_true, 'b')

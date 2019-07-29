@@ -47,7 +47,7 @@ TEST(hotcall, 3) {
     BUNDLE_BEGIN();
 
     int x = 0, y = 0;
-    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret, .has_return = true ), VAR(x, 'd'), VAR(y, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret), VAR(x, 'd'), VAR(y, 'd'));
 
     BUNDLE_END();
 
@@ -65,8 +65,8 @@ TEST(hotcall, 4) {
     BUNDLE_BEGIN();
 
     int x = 0, y = 0, z = 0;
-    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret, .has_return = true ), VAR(x, 'd'), VAR(y, 'd'));
-    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret, .has_return = true ), VAR(y, 'd'), VAR(z, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret), VAR(x, 'd'), VAR(y, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret), VAR(y, 'd'), VAR(z, 'd'));
 
     BUNDLE_END();
 
@@ -91,8 +91,8 @@ TEST(hotcall, 5) {
     //struct parameter vec1[] = { VAR(x_ptr, 'd'), PTR(&vec1[0], .dereference = true) }, p1 = vec1[1];
     //struct parameter vec2[] = { VAR(y_ptr, 'd'), PTR(&vec2[0], .dereference = true) }, p2 = vec2[1];
 
-    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret, .has_return = true ), PTR(x_ptr), VAR(y, 'd'));
-    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret, .has_return = true ), PTR(y_ptr), VAR(z, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret), PTR(x_ptr), VAR(y, 'd'));
+    HCALL(CONFIG(.function_id = hotcall_ecall_plus_one_ret), PTR(y_ptr), VAR(z, 'd'));
 
     BUNDLE_END();
 
