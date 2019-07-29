@@ -1,6 +1,6 @@
 #ifndef _H_ECALL_WRAPPERS_
 #define _H_ECALL_WRAPPERS_
-
+/*
 #include "functions.h"
 #include "ecalls.h"
 
@@ -18,17 +18,22 @@ wrapper_ecall_get_addr(unsigned int n_iters, unsigned int n_params, void *args[n
     }
 }
 
-static void
-wrapper_ecall_greater_than_y(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
-    for(int i = 0; i < n_iters; ++i) {
-        *(bool *) args[n_params - 1][i] = ecall_greater_than_y((int *) args[0][i], *(int *) args[1][i]);
-    }
+void
+wrapper_ecall_plus_one(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
+  for(int i = 0; i < n_iters; ++i) {
+    ecall_plus_one((args[0][i]));
+  }
 }
 
-static void
-wrapper_ecall_plus_one(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
+void
+wrapper_ecall_greater_than_y(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
+    int *arg1 = args[0];
+    int *arg2 = args[1];
+    bool *ret = args[n_params - 1];
     for(int i = 0; i < n_iters; ++i) {
-        ecall_plus_one((int *) args[i][0]);
+        //ret[i] = ecall_greater_than_y(arg1 + i, *(arg2));
+        bool tmp = ecall_greater_than_y((int *) args[0][i], *(int *) args[1][i]);
+        *(bool *) args[n_params - 1][i] = tmp;
     }
 }
 
@@ -43,13 +48,6 @@ static void
 wrapper_ecall_always_false(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
     for(int i = 0; i < n_iters; ++i) {
         *(bool *) args[n_params - 1][i] = ecall_always_false();
-    }
-}
-
-static void
-wrapper_ecall_foo(unsigned int n_iters, unsigned int n_params, void *args[n_params][n_iters]) {
-    for(int i = 0; i < n_iters; ++i) {
-        ecall_foo();
     }
 }
 
@@ -261,5 +259,5 @@ wrapper_ecall_test_func_15(unsigned int n_iters, unsigned int n_params, void *ar
         );
     }
 }
-
+*/
 #endif
