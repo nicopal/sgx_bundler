@@ -136,6 +136,18 @@ benchmark_hotcall_for_each_sz_50(struct shared_memory_ctx *sm_ctx, unsigned int 
 unsigned int
 benchmark_hotcall_for_each_sz_100(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
 
+
+
+unsigned int
+benchmark_memoize_fifo(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_memoize_lru(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_memoize_modifications(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_memoize_off(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+
+
 typedef unsigned long long ticks;
 static __inline__ ticks start (void) {
   unsigned cycles_low, cycles_high;

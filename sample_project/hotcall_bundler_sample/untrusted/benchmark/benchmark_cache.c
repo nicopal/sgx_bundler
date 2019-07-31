@@ -19,7 +19,7 @@ benchmark_cache(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
         uint32_t hash = hcall_hash_words(tmp, 2, 0);
         struct memoize_config memo = { .hash = hash , .return_type = 'd'};
         HCALL(
-            CONFIG(.function_id = hotcall_ecall_add_and_count, .has_return = true, .memoize = &memo),
+            CONFIG(.function_id = hotcall_ecall_add_and_count, .memoize = &memo),
             VAR(x, 'd'), VAR(y, 'd'), PTR(&counter), VAR(res, 'd'));
         CLOSE
 

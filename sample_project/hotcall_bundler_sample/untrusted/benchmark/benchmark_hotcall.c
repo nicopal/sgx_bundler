@@ -5,7 +5,7 @@
 #include "postfix_translator.h"
 #include "hotcall_bundler_sample_u.h"
 #include "sample.h"
-
+#include <x86intrin.h>
 
 /*
 *   What is the effect on the number of arguments ?
@@ -26,17 +26,18 @@ benchmark_hotcall_0(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, boo
     char file_path[256] = DATA_PATH;
     strcat(file_path, output_dir);
     char file_name[256];
-    create_file_name(file_name, "hotcall", cold_cache, cache_clear_multiple);
+    create_file_name(file_name, "hotcall_0", cold_cache, cache_clear_multiple);
     printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
     unsigned int warmup = n_rounds/5, rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache && i >= warmup) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
-        BEGIN
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        s = __rdtscp(aux);
         HCALL_SIMPLE(CONFIG(.function_id = hotcall_ecall_test_func_0));
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            rounds[i - warmup] = GET_TIME
+            rounds[i - warmup] = e - s;
         }
     }
     write_to_file(file_path, file_name, rounds, n_rounds);
@@ -49,17 +50,18 @@ benchmark_vanilla_0(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, boo
     char file_path[256] = DATA_PATH;
     strcat(file_path, output_dir);
     char file_name[256];
-    create_file_name(file_name, "vanilla", cold_cache, cache_clear_multiple);
+    create_file_name(file_name, "vanilla_0", cold_cache, cache_clear_multiple);
     printf("Dir: %s, File: %s\n", file_path, file_name);
+    unsigned int _aux, *aux = &_aux; unsigned long long s, e;
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
     unsigned int warmup = n_rounds / 5, rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache && i >= warmup) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
-        BEGIN
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        s = __rdtscp(aux);
         ecall_test_func_0(global_eid);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            rounds[i - warmup] = GET_TIME
+            rounds[i - warmup] = e - s;
         }
     }
     write_to_file(file_path, file_name, rounds, n_rounds);
@@ -69,149 +71,131 @@ benchmark_vanilla_0(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, boo
 
 unsigned int
 benchmark_hotcall_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_hotcall_1";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "hotcall_1", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int x = 0;
-        BEGIN
+        s = __rdtscp(aux);
         HCALL_SIMPLE(CONFIG(.function_id = hotcall_ecall_test_func_1), VAR(x, 'd'));
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_vanilla_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_vanilla_1";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "vanilla_1", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int x = 0;
-        BEGIN
+        s = __rdtscp(aux);
         ecall_test_func_1(global_eid, x);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_hotcall_3(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_hotcall_3";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "hotcall_3", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int x = 0, y = 0, z = 0;
-        BEGIN
+        s = __rdtscp(aux);
         HCALL_SIMPLE(CONFIG(.function_id = hotcall_ecall_test_func_3), VAR(x, 'd'), VAR(y, 'd'), VAR(z, 'd'));
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_vanilla_3(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_vanilla_3";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "vanilla_3", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int x = 0, y = 0, z = 0;
-        BEGIN
+        s = __rdtscp(aux);
         ecall_test_func_3(global_eid, x, y, z);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_hotcall_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_hotcall_5";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "hotcall_5", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e;
         a = b = c = d = e = 0;
-        BEGIN
+        s = __rdtscp(aux);
         HCALL_SIMPLE(
             CONFIG(.function_id = hotcall_ecall_test_func_5),
             VAR(a, 'd'),
@@ -220,70 +204,63 @@ benchmark_hotcall_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, boo
             VAR(d, 'd'),
             VAR(e, 'd'),
         );
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_vanilla_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_vanilla_5";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "vanilla_5", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e;
         a = b = c = d = e = 0;
-        BEGIN
+        s = __rdtscp(aux);
         ecall_test_func_5(global_eid, a, b, c, d, e);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_hotcall_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_hotcall_10";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "hotcall_10", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e, f, g, h, t, j;
         a = b = c = d = e = f = g = h = t = j = 0;
-        BEGIN
+        s = __rdtscp(aux);
         HCALL_SIMPLE(
             CONFIG(.function_id = hotcall_ecall_test_func_10),
             VAR(a, 'd'),
@@ -297,47 +274,43 @@ benchmark_hotcall_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
             VAR(t, 'd'),
             VAR(j, 'd')
         );
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
 
 unsigned int
 benchmark_vanilla_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_vanilla_10";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "vanilla_10", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e, f, g, h, t, j;
         a = b = c = d = e = f = g = h = t = j = 0;
-        BEGIN
+        s = __rdtscp(aux);
         ecall_test_func_10(global_eid, a, b, c, d, e, f, g, h, t, j);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }
@@ -347,15 +320,16 @@ benchmark_hotcall_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
     char file_path[256] = DATA_PATH;
     strcat(file_path, output_dir);
     char file_name[256];
-    create_file_name(file_name, "hotcall", cold_cache, cache_clear_multiple);
+    create_file_name(file_name, "hotcall_15", cold_cache, cache_clear_multiple);
     printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
     unsigned int warmup = n_rounds/5, rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache && i >= warmup) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e, f, g, h, t, j, l, m, n, o, p;
         a = b = c = d = e = f = g = h = t = j = l = m = n = o = p = 0;
-        BEGIN
+        s = __rdtscp(aux);
         HCALL_SIMPLE(
             CONFIG(.function_id = hotcall_ecall_test_func_15),
             VAR(a, 'd'),
@@ -374,9 +348,9 @@ benchmark_hotcall_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
             VAR(o, 'd'),
             VAR(p, 'd'),
         );
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            rounds[i - warmup] = GET_TIME
+            rounds[i - warmup] = e - s;
         }
     }
     write_to_file(file_path, file_name, rounds, n_rounds);
@@ -386,63 +360,29 @@ benchmark_hotcall_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bo
 
 unsigned int
 benchmark_vanilla_15(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir) {
-    char file_dir[] = DATA_PATH "/hotcall/benchmark_vanilla_15";
-    char file_path[256];
-    sprintf(file_path, "%s/%s", file_dir, cold_cache ? "cold" : "warm");
-    create_test_folder(file_dir);
-
-    FILE *fp;
-    fp = fopen(file_path, "a");
-
+    char file_path[256] = DATA_PATH;
+    strcat(file_path, output_dir);
+    char file_name[256];
+    create_file_name(file_name, "vanilla_15", cold_cache, cache_clear_multiple);
+    printf("Dir: %s, File: %s\n", file_path, file_name);
     char *buf = (char *) malloc(cache_clear_multiple * L3_CACHE_SIZE);
-    unsigned int warmup = n_rounds / 10, t = 0;
+	unsigned int _aux, *aux = &_aux; unsigned long long s, e;
+    unsigned int warmup = n_rounds / 5, t = 0;
     unsigned int rounds[n_rounds];
     for(int i = 0; i < (n_rounds + warmup); ++i) {
-        if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
+        if(cold_cache && i >= warmup) clearcache(buf, cache_clear_multiple * L3_CACHE_SIZE);
         int a, b, c, d, e, f, g, h, t, j, l, m, n, o, p;
         a = b = c = d = e = f = g = h = t = j = l = m = n = o = p = 0;
-        BEGIN
+        s = __rdtscp(aux);
         ecall_test_func_15(global_eid, a, b, c, d, e, f, g, h, t, j, l, m, n, o, p);
-        CLOSE
+        e = __rdtscp(aux);
         if(i >= warmup) {
-            t = GET_TIME
+            t = e - s;
             rounds[i - warmup] = t;
-            fprintf(fp, "%u\n", t);
+
         }
     }
-    fclose(fp);
-
-    qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
-    return rounds[n_rounds / 2];
-}
-
-
-void
-variadic_function(int n, ...) {
-    va_list args;
-    va_start(args, n);
-
-    int x = 0;
-    for(int i = 0; i < n; ++i) {
-        x += va_arg(args, int);
-    }
-
-    va_end(args);
-}
-
-unsigned int
-benchmark_variadic_function(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
-    unsigned int warmup = n_rounds / 10;
-    unsigned int rounds[n_rounds];
-    for(int i = 0; i < (n_rounds + warmup); ++i) {
-        //if(cold_cache) clear_cache(buf, cache_clear_multiple * L3_CACHE_SIZE);
-        BEGIN
-        variadic_function(10, 1, 2, 3, 4, 5, 6, 7, 8, 9);
-        CLOSE
-        if(i >= warmup) {
-            rounds[i - warmup] = GET_TIME
-        }
-    }
+    write_to_file(file_path, file_name, rounds, n_rounds);
     qsort(rounds, n_rounds, sizeof(unsigned int), cmpfunc);
     return rounds[n_rounds / 2];
 }

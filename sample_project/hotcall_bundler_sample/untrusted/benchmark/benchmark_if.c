@@ -144,12 +144,12 @@ benchmark_if_naive(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) {
         bool res;
         //HCALL(sm_ctx, ecall_always_true, false, &res, 0, NULL);
         HCALL(
-                ((struct hotcall_function_config) { .function_id = hotcall_ecall_always_true, .has_return = true }),
+                ((struct hotcall_function_config) { .function_id = hotcall_ecall_always_true}),
 		        (struct parameter) { .type = VARIABLE_TYPE, .value = { .variable = { .arg = &res }}}
         );
         if(res) {
             //HCALL(sm_ctx, ecall_foo, false, NULL, 0, NULL);
-            HCALL(((struct hotcall_function_config) { .function_id = hotcall_ecall_foo, .has_return = false }));
+            HCALL(((struct hotcall_function_config) { .function_id = hotcall_ecall_foo}));
         }
         CLOSE
 
@@ -187,9 +187,9 @@ benchmark_if_optimized(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds) 
         /*
 
         for(int i = 0; i < n_iters; ++i) {
-            HCALL(CONFIG(.function_id = hotcall_ecall_always_true, .has_return = true), VAR(y, 'd'));
+            HCALL(CONFIG(.function_id = hotcall_ecall_always_true"", VAR(y, 'd'));
             if(y) {
-                HCALL(CONFIG(.function_id = hotcall_ecall_always_true, .has_return = true), VAR(y, 'd'));
+                HCALL(CONFIG(.function_id = hotcall_ecall_always_true"", VAR(y, 'd'));
             }
         }
 
