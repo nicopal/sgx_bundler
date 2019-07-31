@@ -3,6 +3,7 @@
 
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #define DATA_PATH "./data/"
 #define L3_CACHE_SIZE 1024 * 1024 * 4
@@ -76,6 +77,65 @@ benchmark_for(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
 unsigned int
 benchmark_cache(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds);
 
+
+/* Hotcall bundle tests */
+
+unsigned int
+benchmark_hotcall_sz_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_2(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_25(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_50(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_sz_100(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+
+unsigned int
+benchmark_hotcall_bundle_sz_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_2(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_25(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_50(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_bundle_sz_100(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+
+unsigned int
+benchmark_hotcall_for_sz_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_sz_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_sz_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_sz_25(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_sz_50(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_sz_100(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+
+unsigned int
+benchmark_hotcall_for_each_sz_1(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_each_sz_5(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_each_sz_10(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_each_sz_25(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_each_sz_50(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+unsigned int
+benchmark_hotcall_for_each_sz_100(struct shared_memory_ctx *sm_ctx, unsigned int n_rounds, bool cold_cache, unsigned int cache_clear_multiple, char *output_dir);
+
 typedef unsigned long long ticks;
 static __inline__ ticks start (void) {
   unsigned cycles_low, cycles_high;
@@ -117,5 +177,20 @@ static ticks e_time;
     }
 
 #define GET_TIME e_time - b_time;
+
+
+inline __attribute__((always_inline)) uint64_t clearcache(void *buf, size_t size) {
+    uint64_t sum;
+    size_t count = size / sizeof(uint64_t);
+    volatile uint64_t *p = (volatile uint64_t *) buf;
+    while (count--) {
+        sum += *p;
+        *p++ = 0;
+    }
+
+    asm volatile ("mfence");
+    return sum;
+}
+
 
 #endif

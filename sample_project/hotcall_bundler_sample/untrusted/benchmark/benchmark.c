@@ -44,7 +44,8 @@ int memset_s(void *v, int c, size_t n) {
 
 void
 clear_cache(char *buf, unsigned int buf_size) {
-    memset_s((void *) buf, 1, buf_size);
+    //memset_s((void *) buf, 1, buf_size);
+    system("cat /proc/wbinvd");
 }
 
 void
