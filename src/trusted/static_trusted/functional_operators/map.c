@@ -20,7 +20,7 @@ hotcall_handle_map(struct ecall_queue_item *qi, const struct hotcall_config *hot
     sgx_assert(params_in != NULL, "Map input parameters contains no vector.");
     #endif
 
-    void *args[n_iters][n_params];
+    void *args[n_params][n_iters];
     parse_arguments(ma->params, n_iters, n_params, args, 0);
     execute_function(hotcall_config, ma->config->function_id, n_iters, n_params, args);
 }

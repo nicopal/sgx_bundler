@@ -30,6 +30,7 @@ enum parameter_type { FUNCTION_TYPE, VARIABLE_TYPE, POINTER_TYPE, VECTOR_TYPE, S
         SM_CTX->hcall.batch->top->next = &CAT2(QUEUE_ITEM_, ID);\
         SM_CTX->hcall.batch->top = &CAT2(QUEUE_ITEM_, ID);\
     }
+
 #define _HCALL_MEMOIZE(SM_CTX, ID, CONFIG, ...) \
     struct parameter CAT2(HCALL_ARGS_, ID)[] = { __VA_ARGS__ }; \
     struct hotcall_function_config CAT2(HCALL_CONFIG_, ID) = CONFIG; \
@@ -41,8 +42,10 @@ enum parameter_type { FUNCTION_TYPE, VARIABLE_TYPE, POINTER_TYPE, VECTOR_TYPE, S
         _f_ctx = (SM_CTX)->mem.functions[CAT2(HCALL_CONFIG_, ID).function_id]; \
         struct cache_entry *ce; \
         HCALL_HMAP_FOR_EACH_WITH_HASH(ce, hmap_node, CAT2(HCALL_CONFIG_, ID).memoize->hash, &_f_ctx->cache) { \
-            hcall_list_remove(&ce->lru_list_node); \
-            hcall_list_push_back(&_f_ctx->lru_list, &ce->lru_list_node); \
+            if(CAT2(HCALL_CONFIG_, ID).memoize->eviction_policy == LRU) { \
+                hcall_list_remove(&ce->lru_list_node); \
+                hcall_list_push_back(&_f_ctx->lru_list, &ce->lru_list_node); \
+            } \
             switch(CAT2(HCALL_CONFIG_, ID).memoize->return_type) { \
                 case 'd': \
                     *(int *) CAT2(HCALL_ARGS_, ID)[CAT2(HCALL_CONFIG_, ID).n_params - 1].value.variable.arg = ACCESS_FIELD(ce->type, INT_TYPE); \
@@ -79,8 +82,10 @@ enum parameter_type { FUNCTION_TYPE, VARIABLE_TYPE, POINTER_TYPE, VECTOR_TYPE, S
           _f_ctx = (SM_CTX)->mem.functions[CAT2(HCALL_CONFIG_, ID).function_id]; \
           struct cache_entry *ce; \
           HCALL_HMAP_FOR_EACH_WITH_HASH(ce, hmap_node, CAT2(HCALL_CONFIG_, ID).memoize->hash, &_f_ctx->cache) { \
-              hcall_list_remove(&ce->lru_list_node); \
-              hcall_list_push_back(&_f_ctx->lru_list, &ce->lru_list_node); \
+              if(CAT2(HCALL_CONFIG_, ID).memoize->eviction_policy == LRU) { \
+                  hcall_list_remove(&ce->lru_list_node); \
+                  hcall_list_push_back(&_f_ctx->lru_list, &ce->lru_list_node); \
+              } \
               switch(CAT2(HCALL_CONFIG_, ID).memoize->return_type) { \
                   case 'd': \
                       *(int *) CAT2(HCALL_ARGS_, ID)[CAT2(HCALL_CONFIG_, ID).n_params - 1].value.variable.arg = ACCESS_FIELD(ce->type, INT_TYPE); \
@@ -190,11 +195,12 @@ struct parameter {
     union parameter_types value;
 };
 
-
+enum cache_eviction_policy { FIFO, LRU };
 struct memoize_config {
     uint32_t hash;
     const char return_type;
     bool manual_update;
+    enum cache_eviction_policy eviction_policy;
 };
 
 enum invalidate_type { RETURN_VALUE, HASH, CLEAR_CACHE, VALUE };
