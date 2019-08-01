@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "hotcall_config.h"
 #include "ecall_wrappers.h"
+#include "ecalls.h"
 
 #include <math.h>
 
@@ -15,11 +16,9 @@ void *call_table[CALL_TABLE_CAPACITY] = {
     [hotcall_ecall_always_true] = wrapper_ecall_always_true,
     [hotcall_ecall_always_false] = wrapper_ecall_always_false,
     [hotcall_ecall_foo] = wrapper_ecall_foo,
-    [hotcall_ecall_bar] = wrapper_ecall_bar,
     [hotcall_ecall_plus_one] = wrapper_ecall_plus_one,
     [hotcall_ecall_greater_than_two] = wrapper_ecall_greater_than_two,
     [hotcall_ecall_plus_one_ret] = wrapper_ecall_plus_one_ret,
-    [hotcall_ecall_plus_one_ret_v2] = wrapper_ecall_plus_one_ret_v2,
     [hotcall_ecall_plus] = wrapper_ecall_plus,
     [hotcall_ecall_plus_y] = wrapper_ecall_plus_y,
     [hotcall_ecall_zero] = wrapper_ecall_zero,
@@ -36,12 +35,12 @@ void *call_table[CALL_TABLE_CAPACITY] = {
     [hotcall_ecall_plus_plus] = wrapper_ecall_plus_plus,
     [hotcall_ecall_for_each_10_test] = wrapper_ecall_for_each_10_test,
     [hotcall_ecall_add_and_count] = wrapper_ecall_add_and_count,
-    [hotcall_ecall_test_func_0] = ecall_test_func_0,
-    [hotcall_ecall_test_func_1] = ecall_test_func_1,
-    [hotcall_ecall_test_func_3] = ecall_test_func_3,
-    [hotcall_ecall_test_func_5] = ecall_test_func_5,
-    [hotcall_ecall_test_func_10] = ecall_test_func_10,
-    [hotcall_ecall_test_func_15] = ecall_test_func_15
+    [hotcall_ecall_test_func_0] = wrapper_ecall_test_func_0,
+    [hotcall_ecall_test_func_1] = wrapper_ecall_test_func_1,
+    [hotcall_ecall_test_func_3] = wrapper_ecall_test_func_3,
+    [hotcall_ecall_test_func_5] = wrapper_ecall_test_func_5,
+    [hotcall_ecall_test_func_10] = wrapper_ecall_test_func_10,
+    [hotcall_ecall_test_func_15] = wrapper_ecall_test_func_15
 };
 
 void

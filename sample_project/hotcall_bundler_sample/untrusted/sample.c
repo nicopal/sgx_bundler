@@ -112,7 +112,7 @@ int SGX_CDECL main(int argc, char *argv[])
     } else if(!strcmp(benchmark_name, "hotcall_sz_1")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_sz_2")) {
-       benchmark_v2(&sm_ctx, benchmark_hotcall_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+       benchmark_v2(&sm_ctx, benchmark_hotcall_sz_2, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_sz_5")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_sz_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_sz_10")) {
@@ -126,7 +126,7 @@ int SGX_CDECL main(int argc, char *argv[])
     } else if(!strcmp(benchmark_name, "hotcall_bundle_sz_1")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_bundle_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_bundle_sz_2")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_bundle_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_bundle_sz_2, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_bundle_sz_5")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_bundle_sz_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_bundle_sz_10")) {
@@ -139,8 +139,10 @@ int SGX_CDECL main(int argc, char *argv[])
         benchmark_v2(&sm_ctx, benchmark_hotcall_bundle_sz_100, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_sz_1")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_for_sz_2")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_2, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_sz_5")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_sz_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_sz_10")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_10, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_sz_25")) {
@@ -151,6 +153,8 @@ int SGX_CDECL main(int argc, char *argv[])
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_100, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_1")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_2")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_2, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_5")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_10")) {
@@ -158,10 +162,55 @@ int SGX_CDECL main(int argc, char *argv[])
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_25")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_25, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_50")) {
-        benchmark_v2(&sm_ctx, benchmark_hotcall_for_sz_50, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+        benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_50, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     } else if(!strcmp(benchmark_name, "hotcall_for_each_sz_100")) {
         benchmark_v2(&sm_ctx, benchmark_hotcall_for_each_sz_100, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "memoize_lru")) {
+        benchmark_v2(&sm_ctx, benchmark_memoize_lru, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "memoize_fifo")) {
+        benchmark_v2(&sm_ctx, benchmark_memoize_fifo, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "memoize_off")) {
+        benchmark_v2(&sm_ctx, benchmark_memoize_off, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "memoize_mod")) {
+        benchmark_v2(&sm_ctx, benchmark_memoize_modifications, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_true")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_true, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_true_naive")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_true_naive, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_false")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_false, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_false_naive")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_false_naive, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_true_loop")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_true_loop, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_true_naive_loop")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_true_naive_loop, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_false_loop")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_false_loop, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_branch_false_naive_loop")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_branch_false_naive_loop, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_loop_1")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_loop_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_loop_3")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_loop_3, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_loop_5")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_loop_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_loop_10")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_loop_10, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_iterator_1")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_iterator_1, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_iterator_3")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_iterator_3, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_iterator_5")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_iterator_5, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_iterator_10")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_iterator_10, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_iterator_filter")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_iterator_filter, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
+    } else if(!strcmp(benchmark_name, "hotcall_loop_filter")) {
+        benchmark_v2(&sm_ctx, benchmark_hotcall_loop_filter, n_iters, ROUNDS, cold_cache, cache_clear_size_multiple, output_path);
     }
+
 
 
     if(strstr(benchmark_name, "vanilla") == NULL) {

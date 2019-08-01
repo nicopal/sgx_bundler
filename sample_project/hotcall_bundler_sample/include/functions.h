@@ -11,7 +11,6 @@
 #define hotcall_ecall_greater_than_y 7
 #define hotcall_ecall_plus_one_ret 8
 #define hotcall_ecall_plus 9
-#define hotcall_ecall_revert 10
 #define hotcall_ecall_plus_y 11
 #define hotcall_ecall_zero 12
 #define hotcall_ecall_plus_y_v2 13
@@ -26,7 +25,6 @@
 #define hotcall_ecall_for_each_10_test 22
 #define hotcall_ecall_add_and_count 23
 #define hotcall_ecall_get_addr 24
-#define hotcall_ecall_plus_one_ret_v2 25
 
 
 #define hotcall_ecall_test_func_0 30
